@@ -2,18 +2,33 @@
 scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
 
 "A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
-scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+scalar DateTime
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
 
 "A datetime and timezone string in ISO 8601 format `Y-m-dTH:i:sO`, e.g. `2020-04-20T13:53:12+02:00`."
-scalar DateTimeTz @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTimeTz")
+scalar DateTimeTz
+    @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTimeTz")
 
 type Query {
     users: [User!]! @paginate(defaultCount: 10)
     user(id: ID @eq): User @find
     posts: [Post!]! @all
     post(id: Int! @eq): Post @find
+    rfqs: [Rfqs!]! @all
+    rfq_detail: [RFQDetail!]! @all
 }
 
+type Mutation {
+    createRfq(
+        rfq_no: String!
+        rfq_date: String!
+        unit_code: String!
+        status: String!
+        vessel_id: String!
+        user_id: String!
+    ): Rfqs! @create
+    createUser(name: String!, email: String, password: String): User! @create
+}
 type User {
     id: ID!
     name: String!
@@ -35,4 +50,23 @@ type Comment {
     id: ID!
     reply: String!
     post: Post! @belongsTo
+}
+
+type Rfqs {
+    id: ID!
+    rfq_no: String!
+    rfq_date: String!
+    unit_code: String!
+    status: String!
+    vessel_id: String!
+    service_type: String
+    user: User! @belongsTo
+    detail: [RFQDetail!]! @hasMany
+}
+type RFQDetail {
+    id: ID!
+    rfq: Rfqs! @belongsTo
+    item_service: String!
+    description: String!
+    price: String!
 }
